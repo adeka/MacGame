@@ -17,7 +17,7 @@
 	<script>
 
 	// create an new instance of a pixi stage
-	var stage = new PIXI.Stage(0x000111);
+	var stage = new PIXI.Stage(0x000111, true);
 
 	// create a renderer instance
 	var renderer = new PIXI.WebGLRenderer(800, 500);//autoDetectRenderer(400, 300);
@@ -39,11 +39,46 @@
 	var profileImage = new PIXI.Sprite(profileTex);
 	var cashImage = new PIXI.Sprite(cashTex);
 	var happyImage = new PIXI.Sprite(happyTex);
+
 	var houseImage = new PIXI.Sprite(houseTex);
+    houseImage.setInteractive(true);
+    houseImage.mouseover = function(mouseData){
+       houseImage.alpha = 4;
+    }
+    houseImage.mouseout = function(mouseData){
+       houseImage.alpha = 1;
+    }
+
+
 	var carImage = new PIXI.Sprite(carTex);
+    carImage.setInteractive(true);
+    carImage.mouseover = function(mouseData){
+       carImage.alpha = 4;
+    }
+    carImage.mouseout = function(mouseData){
+       carImage.alpha = 1;
+    }
+
 	var famImage = new PIXI.Sprite(famTex);
+    famImage.setInteractive(true);
+    famImage.mouseover = function(mouseData){
+       famImage.alpha = 4;
+    }
+    famImage.mouseout = function(mouseData){
+       famImage.alpha = 1;
+    }
 	var cartImage = new PIXI.Sprite(cartTex);
+    cartImage.setInteractive(true);
+    cartImage.mouseover = function(mouseData){
+       cartImage.alpha = 4;
+    }
+    cartImage.mouseout = function(mouseData){
+       cartImage.alpha = 1;
+    }
 	//var bunny = new PIXI.graphicsData.Rectangle(0,0,100,100);
+
+
+
 
     var text = new PIXI.Text("First Name Last Name", {font:"22px Arial", fill:"white"});
     profileImage.addChild(text);
