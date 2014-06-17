@@ -22,7 +22,7 @@ function Insect(stage, x, y) {
     this.hunger = 35 + Math.random() * 60;
     this.mating = 0;
     this.pregnant = 0;
-
+    this.egg;
 
     var bugTex;
 
@@ -69,6 +69,13 @@ Insect.prototype.Mate = function (male) {
     if (this.mating == 0 && male.mating == 0) {
         this.mating = 1;
         male.mating = 1;
+
+        var eggt = PIXI.Texture.fromImage("egg.png");
+        this.egg = new PIXI.Sprite(eggt);
+        this.egg.anchor = {x: 0, y: .5};
+        this.eggScale = .1;
+        this.egg.scale = {x: this.eggScale, y: this.eggScale};
+        this.s.addChild(this.egg);
     }
 }
 
@@ -113,6 +120,26 @@ Insect.prototype.Update = function () {
 
         var scale = 1 + (1 - (this.hunger / 100));
         this.s.scale = {x: -scale, y: scale};
+        if (this.gender == 0 && this.egg && this.mating > 90) {
+            if (this.eggScale < .4) {
+                this.egg.scale = {x: this.eggScale, y: this.eggScale};
+                this.eggScale += .0005;
+            }
+            else {
+                this.mating = 0;
+                console.log("born");
+                this.s.removeChild(this.egg);
+                this.egg = null;
+
+                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
+                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
+                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
+                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
+                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
+                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
+
+            }
+        }
     }
     else {
         this.s.alpha -= .0005;
