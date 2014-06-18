@@ -1,6 +1,9 @@
 /**
  * Created by nfilatov on 5/12/14.
  */
+var simulationSpeed = 5;
+
+
 var bugs = [];
 var walls = [];
 var flowers = [];
@@ -9,7 +12,10 @@ var flowers = [];
 var stage = new PIXI.Stage(0xFFFFFF, true);
 var renderer = new PIXI.WebGLRenderer(1500, 700);//autoDetectRenderer(400, 300);
 document.body.appendChild(renderer.view);
-requestAnimFrame(animate);
+
+for (var i = 0; i < simulationSpeed; i++) {
+    requestAnimFrame(animate);
+}
 
 
 var tile = new PIXI.Sprite(PIXI.Texture.fromImage("tile.png"));
@@ -60,11 +66,14 @@ for (var i = 0; i < 15; i++) {
     flowers.push(t);
 }
 
-for (var i = 0; i < 110; i++) {
-    bugs.push(new Insect(stage, Math.random() * 1300 + 50, Math.random() * 500 + 50));
+for (var i = 0; i < 50; i++) {
+    var bug = new Insect(stage, Math.random() * 1300 + 50, Math.random() * 500 + 50);
+    bug.age = 900 + ( Math.random() * 500);
+    bugs.push(bug);
 }
 
 function animate() {
+
 
     for (var i = 0; i < bugs.length; i++) {
 
@@ -86,11 +95,15 @@ function animate() {
         }
         for (var j = 0; j < bugs.length; j++) {
             if (!(bugs[i] === bugs[j]) && bugs[i].CheckCollision(bugs[j].s) < 15) {
-                if (bugs[i].hunger < 50 && bugs[j].hunger < 50) {
+
+                if ((bugs[i].hunger < 50 && bugs[j].hunger < 50) &&
+                    (!bugs[i].eating && !bugs[j].eating) &&
+                    (bugs[i].age > bugs[i].adulthoodAge && bugs[j].age > bugs[j].adulthoodAge)) {
+
                     if (bugs[i].gender == 0 && bugs[j].gender == 1) {
                         bugs[i].Mate(bugs[j]);
                     }
-                    else if(bugs[i].gender == 1 && bugs[j].gender == 0){
+                    else if (bugs[i].gender == 1 && bugs[j].gender == 0) {
                         bugs[j].Mate(bugs[i]);
                     }
                 }
@@ -98,9 +111,10 @@ function animate() {
                     bugs[i].ReCalc();
                 }
             }
-
         }
+
     }
+
     requestAnimFrame(animate);
     renderer.render(stage);
 }

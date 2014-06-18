@@ -12,6 +12,13 @@ function Insect(stage, x, y) {
     this.ANGLE_CHANGE = .5;
     this.speed = 0.0;
 
+    this.litterSize = 3;
+    this.litterVariation = 1;
+
+    this.maxAge = 8600;
+    this.adulthoodAge = 700;
+    this.age = 0;//900 + ( Math.random() * 500);
+
 
     this.gender = Math.round(Math.random());
     this.stamina = Math.random() * 100;
@@ -19,7 +26,7 @@ function Insect(stage, x, y) {
     this.dead = false;
     this.starving = 0;
     this.eating = false;
-    this.hunger = 35 + Math.random() * 60;
+    this.hunger = 0;//35 + Math.random() * 60;
     this.mating = 0;
     this.pregnant = 0;
     this.egg;
@@ -117,9 +124,18 @@ Insect.prototype.Update = function () {
         if (this.starving >= 150) {
             this.Die();
         }
+        if(this.age > this.maxAge){
+            this.Die();
+        }
 
-        var scale = 1 + (1 - (this.hunger / 100));
-        this.s.scale = {x: -scale, y: scale};
+        //var scale = 1 + (1 - (this.hunger / 100));
+        var finalAge = (this.age / this.adulthoodAge);
+        if (finalAge > 1) finalAge = 1;
+        var scaleX = .6 + finalAge*.8;
+        var scaleY = .4 + (1 - (this.hunger / 100));
+        this.s.scale = {x: -scaleX, y: scaleY};
+        this.age++;
+
         if (this.gender == 0 && this.egg && this.mating > 90) {
             if (this.eggScale < .4) {
                 this.egg.scale = {x: this.eggScale, y: this.eggScale};
@@ -130,19 +146,17 @@ Insect.prototype.Update = function () {
                 console.log("born");
                 this.s.removeChild(this.egg);
                 this.egg = null;
-
-                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
-                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
-                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
-                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
-                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
-                bugs.push(new Insect(stage, this.s.position.x, this.s.position.x));
+                var spawnAmount = this.litterSize + (Math.round(Math.random() * this.litterVariation));
+                for (var i = 0; i < 3; i++) {
+                    var child = new Insect(stage, this.s.position.x + (-8 + Math.random() * 16), this.s.position.y + (-8 + Math.random() * 16));
+                    bugs.push(child);
+                }
 
             }
         }
     }
     else {
-        this.s.alpha -= .0005;
+        this.s.alpha -= .005;
     }
 }
 
