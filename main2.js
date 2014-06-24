@@ -1,7 +1,7 @@
 /**
  * Created by nfilatov on 5/12/14.
  */
-var simulationSpeed = 5;
+var simulationSpeed = 1;
 
 
 var bugs = [];
