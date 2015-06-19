@@ -1,6 +1,9 @@
 /**
  * Created by nfilatov on 6/17/14.
  */
+
+
+
 function Insect(stage, x, y) {
     this.velocity = { x: 0, y: 0};
     this.max_force = 1.0;
@@ -15,8 +18,8 @@ function Insect(stage, x, y) {
     this.litterSize = 3;
     this.litterVariation = 1;
 
-    this.maxAge = 8600;
-    this.adulthoodAge = 700;
+    this.maxAge = 9915000;
+    this.adulthoodAge = 1500;
     this.age = 0;//900 + ( Math.random() * 500);
 
 
@@ -26,10 +29,12 @@ function Insect(stage, x, y) {
     this.dead = false;
     this.starving = 0;
     this.eating = false;
-    this.hunger = 0;//35 + Math.random() * 60;
+    this.hunger = Math.random() * 60;
+    this.food = -1;
     this.mating = 0;
     this.pregnant = 0;
     this.egg;
+    this.seeking = false;
 
     var bugTex;
 
@@ -105,12 +110,20 @@ Insect.prototype.Update = function () {
                 this.mating += .3;
                 this.s.rotation = Math.sin(this.mating);
             }
-            else {
+            else{
                 this.Move();
+                if(this.food > 0){
+                  this.food--;
+                }
             }
         }
         else {
             this.Eat();
+        }
+
+        if(this.food == 0){
+          this.food = -1;
+          this.Poop();
         }
 
         if (this.hunger < 100) {
@@ -143,7 +156,6 @@ Insect.prototype.Update = function () {
             }
             else {
                 this.mating = 0;
-                console.log("born");
                 this.s.removeChild(this.egg);
                 this.egg = null;
                 var spawnAmount = this.litterSize + (Math.round(Math.random() * this.litterVariation));
@@ -195,7 +207,6 @@ Insect.prototype.Die = function () {
 Insect.prototype.StartEating = function () {
     if (this.hunger > 20 && !this.eating) {
         this.eating = true;
-
     }
 }
 
@@ -205,7 +216,18 @@ Insect.prototype.Eat = function () {
     }
     else {
         this.eating = false;
+        this.food = 1000;
+        this.seeking = false;
     }
+}
+
+Insect.prototype.Poop = function () {
+  var tile = new PIXI.Sprite(PIXI.Texture.fromImage("poop.png"));
+  tile.width = 10;
+  tile.height = 10;
+  stage.addChild(tile);
+  tile.position = {x:this.s.position.x, y:this.s.position.y};
+  console.log("poop");
 }
 
 Insect.prototype.ReCalc = function () {
@@ -215,9 +237,38 @@ Insect.prototype.ReCalc = function () {
 }
 
 Insect.prototype.Wander = function () {
-    this.velocity = { x: 0, y: -1};
+    this.velocity = { x: 0, y: -5};
     this.SetAngle(this.velocity, this.wanderAngle);
-    this.wanderAngle += Math.random() * this.ANGLE_CHANGE - this.ANGLE_CHANGE * .5;
+    if(this.hunger > 51 && !this.seeking){
+      this.flower = this.GetClosestFlower();
+      this.seeking = true;
+    }
+    if(this.seeking){
+      var x = this.flower.position.x - this.s.position.x;
+      var y = this.flower.position.y - this.s.position.y;
+      if (y==Number.MIN_VALUE){
+        console.log("wat");
+      }
+      var angle = Math.atan(x/y) * -(180/Math.PI);
+      this.wanderAngle = angle * this.ANGLE_CHANGE - this.ANGLE_CHANGE * .5;
+    }
+    else{
+      this.wanderAngle += Math.random() * this.ANGLE_CHANGE - this.ANGLE_CHANGE * .5;
+    }
+}
+
+Insect.prototype.GetClosestFlower = function(){
+  var closest = flowers[0];
+  var distance = 100000000;
+  for (var q = 0; q < flowers.length; q++) {
+      var d = Distance(flowers[q].position, this.s.position);
+      //console.log(d);
+      if(d < distance){
+        closest = flowers[q];
+        distance = d;
+      }
+  }
+  return closest;
 }
 
 Insect.prototype.SetAngle = function (vector, value) {
@@ -225,3 +276,11 @@ Insect.prototype.SetAngle = function (vector, value) {
     vector.x = Math.cos(value) * len;
     vector.y = Math.sin(value) * len;
 }
+
+Distance = function(pos1, pos2){
+  var x = pos1.x;
+  var y = pos1.y;
+  var x0 = pos2.x;
+  var y0 = pos2.y;
+  return Math.sqrt((x -= x0) * x + (y -= y0) * y);
+};
